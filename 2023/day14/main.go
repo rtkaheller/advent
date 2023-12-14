@@ -92,7 +92,7 @@ func main() {
 	prev := 0
 	iters := 1000000000
 	for i := 0; i < iters && moved; i++ {
-		key := MemoKey(rocks[:5]) // This shouldn't work, but it does
+		key := MemoKey(rocks)
 		if cache, ok := memo[key]; ok {
 			if last[key] < prev {
 				// Loop detected
@@ -149,8 +149,11 @@ func MemoKey(rocks []*Pos) string {
 	for _, rock := range rocks {
 		dup = append(dup, *rock)
 	}
-	sort.SliceStable(dup, func(i, j int) bool {
-		return dup[i].X < dup[j].X || dup[i].Y < dup[j].Y
+	sort.Slice(dup, func(i, j int) bool {
+		if dup[i].X == dup[j].X {
+			return dup[i].Y <= dup[j].Y
+		}
+		return dup[i].X <= dup[j].X
 	})
 	result := ""
 	for _, rock := range dup {
